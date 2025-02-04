@@ -21,14 +21,14 @@ def generate_decreto(beneficiario, importo, motivo, numero_decreto, data):
     3️⃣ Sezione "Decreta" con la disposizione del pagamento.
     """
     
-    response = openai.chat.completions.create(
+    response = openai.ChatCompletion.create(
         model="gpt-4",
         messages=[
             {"role": "system", "content": "Sei un assistente esperto nella redazione di atti amministrativi."},
             {"role": "user", "content": prompt}
         ]
     )
-    return response.choices[0].message.content.strip()
+    return response.choices[0].message["content"].strip()
 
 # Configura Streamlit
 st.title("📝 Generatore di Decreti di Liquidazione")
@@ -51,7 +51,7 @@ if st.button("Genera Decreto"):
         
         # Opzione per il download
         st.download_button(
-            label="📅 Scarica Decreto",
+            label="🗕️ Scarica Decreto",
             data=decreto_generato,
             file_name=f"Decreto_{numero_decreto}.txt",
             mime="text/plain"
