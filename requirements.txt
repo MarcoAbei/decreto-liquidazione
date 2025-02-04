@@ -1,2 +1,2 @@
 ﻿streamlit
-openai
+transformers
