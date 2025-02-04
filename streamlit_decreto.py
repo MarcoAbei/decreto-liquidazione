@@ -2,6 +2,9 @@ import streamlit as st
 import openai
 import os
 
+openai.api_key = st.secrets["OPENAI_API_KEY"]
+
+
 def generate_decreto(beneficiario, importo, motivo, numero_decreto, data):
     prompt = f"""
     Genera un Decreto di Liquidazione formale con le seguenti informazioni:
