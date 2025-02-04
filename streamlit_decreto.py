@@ -20,15 +20,16 @@ def generate_decreto(beneficiario, importo, motivo, numero_decreto, data):
     2️⃣ Motivazione della liquidazione.
     3️⃣ Sezione "Decreta" con la disposizione del pagamento.
     """
-    
-    response = openai.ChatCompletion.create(
+
+    # Nuovo formato per la chiamata API
+    response = openai.chat.completions.create(
         model="gpt-4",
         messages=[
             {"role": "system", "content": "Sei un assistente esperto nella redazione di atti amministrativi."},
             {"role": "user", "content": prompt}
         ]
     )
-    return response.choices[0].message["content"].strip()
+    return response.choices[0].message.content.strip()
 
 # Configura Streamlit
 st.title("📝 Generatore di Decreti di Liquidazione")
