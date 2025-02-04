@@ -2,8 +2,8 @@ import streamlit as st
 import openai
 import os
 
-openai.api_key = st.secrets["OPENAI_API_KEY"]
-
+# Configura la chiave API di OpenAI
+openai.api_key = os.getenv("OPENAI_API_KEY")
 
 def generate_decreto(beneficiario, importo, motivo, numero_decreto, data):
     prompt = f"""
@@ -21,16 +21,18 @@ def generate_decreto(beneficiario, importo, motivo, numero_decreto, data):
     3️⃣ Sezione "Decreta" con la disposizione del pagamento.
     """
     
-    response = openai.ChatCompletion.create(
+    response = openai.chat.completions.create(
         model="gpt-4",
-        messages=[{"role": "system", "content": "Sei un assistente esperto nella redazione di atti amministrativi."},
-                  {"role": "user", "content": prompt}]
+        messages=[
+            {"role": "system", "content": "Sei un assistente esperto nella redazione di atti amministrativi."},
+            {"role": "user", "content": prompt}
+        ]
     )
-    return response["choices"][0]["message"]["content"].strip()
+    return response.choices[0].message.content.strip()
 
 # Configura Streamlit
-st.title("📝 Baby Matteo")
-st.write("Genera automaticamente un Decreto di Liquidazione conforme agli standard amministrativi con aura infinita.")
+st.title("📝 Generatore di Decreti di Liquidazione")
+st.write("Compila i campi sottostanti per generare automaticamente un Decreto di Liquidazione conforme agli standard amministrativi.")
 
 # Input utente
 numero_decreto = st.text_input("Numero Decreto", "DD-001/2025")
@@ -43,14 +45,13 @@ if st.button("Genera Decreto"):
     if not os.getenv("OPENAI_API_KEY"):
         st.error("⚠️ Imposta la tua chiave API di OpenAI come variabile d'ambiente (OPENAI_API_KEY).")
     else:
-        openai.api_key = os.getenv("OPENAI_API_KEY")
         decreto_generato = generate_decreto(beneficiario, importo, motivo, numero_decreto, data)
         st.subheader("📜 Decreto Generato")
         st.text_area("", decreto_generato, height=300)
         
         # Opzione per il download
         st.download_button(
-            label="📥 Scarica Decreto",
+            label="📅 Scarica Decreto",
             data=decreto_generato,
             file_name=f"Decreto_{numero_decreto}.txt",
             mime="text/plain"
