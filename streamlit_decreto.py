@@ -1,9 +1,8 @@
 import streamlit as st
-import openai
-import os
+from transformers import pipeline
 
-# Configura la chiave API di OpenAI
-openai.api_key = os.getenv("OPENAI_API_KEY")
+# Inizializza il modello Flan-T5
+generator = pipeline("text2text-generation", model="google/flan-t5-small")
 
 def generate_decreto(beneficiario, importo, motivo, numero_decreto, data):
     prompt = f"""
@@ -20,20 +19,13 @@ def generate_decreto(beneficiario, importo, motivo, numero_decreto, data):
     2️⃣ Motivazione della liquidazione.
     3️⃣ Sezione "Decreta" con la disposizione del pagamento.
     """
-
-    # Nuovo formato per la chiamata API
-    response = openai.chat.completions.create(
-        model="gpt-3.5-turbo",
-        messages=[
-            {"role": "system", "content": "Sei un assistente esperto nella redazione di atti amministrativi."},
-            {"role": "user", "content": prompt}
-        ]
-    )
-    return response.choices[0].message.content.strip()
+    
+    response = generator(prompt, max_length=512, do_sample=True)
+    return response[0]['generated_text'].strip()
 
 # Configura Streamlit
-st.title("📝 Generatore di Decreti di Liquidazione")
-st.write("Compila i campi sottostanti per generare automaticamente un Decreto di Liquidazione conforme agli standard amministrativi.")
+st.title("📝 Baby Matteo")
+st.write("genera automaticamente un Decreto di Liquidazione con aura infinita")
 
 # Input utente
 numero_decreto = st.text_input("Numero Decreto", "DD-001/2025")
@@ -43,19 +35,16 @@ importo = st.number_input("Importo (€)", min_value=0.01, format="%.2f")
 motivo = st.text_area("Motivazione della Liquidazione", "Indica il motivo del pagamento")
 
 if st.button("Genera Decreto"):
-    if not os.getenv("OPENAI_API_KEY"):
-        st.error("⚠️ Imposta la tua chiave API di OpenAI come variabile d'ambiente (OPENAI_API_KEY).")
-    else:
-        decreto_generato = generate_decreto(beneficiario, importo, motivo, numero_decreto, data)
-        st.subheader("📜 Decreto Generato")
-        st.text_area("", decreto_generato, height=300)
-        
-        # Opzione per il download
-        st.download_button(
-            label="🗕️ Scarica Decreto",
-            data=decreto_generato,
-            file_name=f"Decreto_{numero_decreto}.txt",
-            mime="text/plain"
-        )
+    decreto_generato = generate_decreto(beneficiario, importo, motivo, numero_decreto, data)
+    st.subheader("📜 Decreto Generato")
+    st.text_area("", decreto_generato, height=300)
+    
+    # Opzione per il download
+    st.download_button(
+        label="🗕️ Scarica Decreto",
+        data=decreto_generato,
+        file_name=f"Decreto_{numero_decreto}.txt",
+        mime="text/plain"
+    )
 
-st.write("🚀 Powered by OpenAI & Streamlit")
+st.write("🚀 Powered by Hugging Face & Streamlit")
