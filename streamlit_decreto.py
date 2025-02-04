@@ -23,7 +23,7 @@ def generate_decreto(beneficiario, importo, motivo, numero_decreto, data):
 
     # Nuovo formato per la chiamata API
     response = openai.chat.completions.create(
-        model="gpt-4",
+        model="gpt-3.5-turbo",
         messages=[
             {"role": "system", "content": "Sei un assistente esperto nella redazione di atti amministrativi."},
             {"role": "user", "content": prompt}
